@@ -1,14 +1,15 @@
-from langchain.chat_models import ChatOpenAI
-from langchain.embeddings import OpenAIEmbeddings
+import uvicorn
+from langchain_openai.chat_models import ChatOpenAI
+from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.schema.messages import HumanMessage, SystemMessage
 from langchain.schema.document import Document
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain.retrievers.multi_vector import MultiVectorRetriever
 import os
-import uuid
-import base64
+import logging
+
 from fastapi import FastAPI, Request, Form, Response, File, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
@@ -33,9 +34,9 @@ app.add_middleware(
 openai_api_key = os.getenv("OPENAI_API_KEY")
 embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
 
-db = FAISS.load_local("faiss_index", embeddings)
+db = FAISS.load_local("faiss_index", embeddings,allow_dangerous_deserialization=True)
 
-prompt_template = """You are a vet doctor and an expert in analyzing dog's health.
+prompt_template = """You are an expert in providing work instructions step by step on how to open a particular web page.
 Answer the question based only on the following context, which can include text, images and tables:
 {context}
 Question: {question}
@@ -66,3 +67,7 @@ async def get_answer(question: str = Form(...)):
             relevant_images.append(d.metadata['original_content'])
     result = qa_chain.run({'context': context, 'question': question})
     return JSONResponse({"relevant_images": relevant_images[0], "result": result})
+
+if __name__ == "__main__":
+    logging.info("starting server with dev configuration")
+    uvicorn.run(app, host="127.0.0.1", port=5000)

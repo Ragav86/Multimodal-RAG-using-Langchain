@@ -1,9 +1,12 @@
 faiss-cpu
-langchain
+langchain~=0.1.13
 openai
-python-dotenv
-fastapi
+python-dotenv~=1.0.1
+fastapi~=0.110.0
 jinja2
 python-multipart
 uvicorn
 tiktoken
+langchain-community
+ipython~=8.23.0
+unstructured~=0.13.2
