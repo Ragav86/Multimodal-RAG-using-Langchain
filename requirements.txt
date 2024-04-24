@@ -10,3 +10,4 @@ tiktoken
 langchain-community
 ipython~=8.23.0
 unstructured~=0.13.2
+langchain_openai
